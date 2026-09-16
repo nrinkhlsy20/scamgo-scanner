@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ScamGo - Scam Scanner</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #090909;
+    color: white;
+    min-height: 100vh;
+    padding: 25px 15px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+.header {
+    text-align: center;
+    padding: 30px 10px;
+}
+
+.logo {
+    font-size: 42px;
+    font-weight: 900;
+    color: #f4a261;
+    letter-spacing: 3px;
+}
+
+.tagline {
+    color: #aaa;
+    margin-top: 8px;
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+.card {
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 18px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+.description {
+    color: #aaa;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    background: #0d0d0d;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 15px;
+    font-family: Arial, sans-serif;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: #f4a261;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.scan-button {
+    background: #f4a261;
+    color: #111;
+}
+
+.clear-button {
+    background: #333;
+    color: white;
+}
+
+.sample-button {
+    background: #242424;
+    color: #f4a261;
+    border: 1px solid #555;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+#scanResult {
+    margin-top: 20px;
+}
+
+.result {
+    background: #101010;
+    border: 1px solid #444;
+    border-radius: 15px;
+    padding: 22px;
+}
+
+.risk-icon {
+    text-align: center;
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.risk-level {
+    text-align: center;
+    color: #f4a261;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.score {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 18px;
+}
+
+.result-description {
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.reasons-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+ul {
+    padding-left: 22px;
+    color: #ddd;
+    line-height: 1.8;
+}
+
+.safety-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: #211b12;
+    border-left: 4px solid #f4a261;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.warning {
+    background: #211b12;
+    border: 1px solid #f4a261;
+    color: #f4a261;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.footer {
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    padding: 20px;
+}
+
+@media (max-width: 600px) {
+    .logo {
+        font-size: 34px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            SCAMGO
+        </div>
+
+        <div class="tagline">
+            SMART AI AGAINST SCAMS
+        </div>
+
+    </div>
+
+
+    <!-- SCANNER -->
+
+    <div class="card">
+
+        <h2>
+            🛡️ Scam Message Scanner
+        </h2>
+
+        <p class="description">
+            Paste a suspicious message below and ScamGo
+            will check for common scam warning signs.
+        </p>
+
+
+        <textarea
+            id="scamMessage"
+            placeholder="Paste a suspicious message here...">
+        </textarea>
+
+
+        <div class="buttons">
+
+            <button
+                class="scan-button"
+                onclick="scanScamMessage()">
+
+                🔍 SCAN MESSAGE
+
+            </button>
+
+
+            <button
+                class="clear-button"
+                onclick="clearScamMessage()">
+
+                CLEAR
+
+            </button>
+
+
+            <button
+                class="sample-button"
+                onclick="loadSampleScam()">
+
+                TRY SAMPLE
+
+            </button>
+
+        </div>
+
+
+        <div id="scanResult"></div>
+
+    </div>
+
+
+    <div class="footer">
+
+        ScamGo © 2026<br>
+        ScamGo helps identify common scam warning signs.
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   SCAMGO SCANNER
+========================================== */
+
+function scanScamMessage() {
+
+    const messageBox =
+        document.getElementById("scamMessage");
+
+    const resultBox =
+        document.getElementById("scanResult");
+
+
+    const message =
+        messageBox.value.trim().toLowerCase();
+
+
+    /* EMPTY MESSAGE */
+
+    if (message === "") {
+
+        resultBox.innerHTML = `
+            <div class="warning">
+                ⚠️ Please enter a message first.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    let score = 0;
+
+    let reasons = [];
+
+
+    /* ==========================================
+       1. URGENT LANGUAGE
+    ========================================== */
+
+    const urgentWords = [
+
+        "urgent",
+        "immediately",
+        "act now",
+        "within 24 hours",
+
+        "segera",
+        "cepat",
+        "sekarang",
+
+        "akaun akan disekat",
+        "akaun akan ditutup",
+        "tindakan segera"
+
+    ];
+
+
+    if (containsAny(message, urgentWords)) {
+
+        score += 20;
+
+        reasons.push(
+            "Uses urgent or threatening language."
+        );
+
+    }
+
+
+    /* ==========================================
+       2. SENSITIVE INFORMATION
+    ========================================== */
+
+    const sensitiveWords = [
+
+        "otp",
+        "tac",
+        "password",
+        "kata laluan",
+        "pin",
+        "username",
+
+        "nombor kad",
+        "nombor ic",
+        "kad pengenalan",
+
+        "bank details",
+        "maklumat bank"
+
+    ];
+
+
+    if (containsAny(message, sensitiveWords)) {
+
+        score += 30;
+
+        reasons.push(
+            "Requests sensitive personal or banking information."
+        );
+
+    }
+
+
+    /* ==========================================
+       3. SUSPICIOUS LINKS
+    ========================================== */
+
+    const suspiciousLinks = [
+
+        "http://",
+        "https://",
+
+        "bit.ly",
+        "tinyurl",
+        "shorturl",
+
+        "click here",
+        "klik sini",
+
+        "claim now",
+        "tekan link"
+
+    ];
+
+
+    if (containsAny(message, suspiciousLinks)) {
+
+        score += 25;
+
+        reasons.push(
+            "Contains a link or asks you to click a link."
+        );
+
+    }
+
+
+    /* ==========================================
+       4. PRIZE / GIVEAWAY
+    ========================================== */
+
+    const prizeWords = [
+
+        "congratulations",
+        "you won",
+        "winner",
+        "free prize",
+
+        "hadiah",
+        "tahniah",
+        "menang",
+        "cabutan bertuah",
+        "percuma"
+
+    ];
+
+
+    if (containsAny(message, prizeWords)) {
+
+        score += 20;
+
+        reasons.push(
+            "Offers an unexpected prize or reward."
+        );
+
+    }
+
+
+    /* ==========================================
+       5. PAYMENT / MONEY
+    ========================================== */
+
+    const moneyWords = [
+
+        "transfer",
+        "bank in",
+        "bayar",
+        "payment",
+        "payment required",
+
+        "rm",
+        "duit",
+        "wang",
+        "fee",
+        "yuran"
+
+    ];
+
+
+    if (containsAny(message, moneyWords)) {
+
+        score += 20;
+
+        reasons.push(
+            "Requests money or payment."
+        );
+
+    }
+
+
+    /* ==========================================
+       6. IMPERSONATION
+    ========================================== */
+
+    const impersonationWords = [
+
+        "bank",
+        "polis",
+        "police",
+        "lhdn",
+
+        "government",
+        "kerajaan",
+
+        "mahkamah",
+        "court",
+
+        "parcel",
+        "delivery"
+
+    ];
+
+
+    if (containsAny(message, impersonationWords)) {
+
+        score += 10;
+
+        reasons.push(
+            "May be pretending to represent an organisation or service."
+        );
+
+    }
+
+
+    /* ==========================================
+       LIMIT SCORE
+    ========================================== */
+
+    score = Math.min(score, 100);
+
+
+    /* ==========================================
+       DETERMINE RISK
+    ========================================== */
+
+    let level;
+    let icon;
+    let description;
+
+
+    if (score >= 60) {
+
+        level = "HIGH RISK";
+
+        icon = "🚨";
+
+        description =
+            "This message contains several warning signs commonly associated with scams.";
+
+    }
+
+    else if (score >= 30) {
+
+        level = "MEDIUM RISK";
+
+        icon = "⚠️";
+
+        description =
+            "This message contains some suspicious signs. Verify it before taking action.";
+
+    }
+
+    else {
+
+        level = "LOW RISK";
+
+        icon = "🟢";
+
+        description =
+            "No strong scam signals were detected, but this does not guarantee that the message is safe.";
+
+    }
+
+
+    /* ==========================================
+       SHOW REASONS
+    ========================================== */
+
+    let reasonHTML = "";
+
+
+    if (reasons.length > 0) {
+
+        reasonHTML = `
+
+            <h4 class="reasons-title">
+                Why is it suspicious?
+            </h4>
+
+            <ul>
+
+                ${reasons
+                    .map(reason => `<li>${reason}</li>`)
+                    .join("")}
+
+            </ul>
+
+        `;
+
+    }
+
+    else {
+
+        reasonHTML = `
+
+            <p style="margin-top:20px;">
+                ✓ No obvious warning signs were detected.
+            </p>
+
+        `;
+
+    }
+
+
+    /* ==========================================
+       DISPLAY RESULT
+    ========================================== */
+
+    resultBox.innerHTML = `
+
+        <div class="result">
+
+            <div class="risk-icon">
+                ${icon}
+            </div>
+
+
+            <h2 class="risk-level">
+                ${level}
+            </h2>
+
+
+            <div class="score">
+
+                Risk Score:
+                <strong>${score}/100</strong>
+
+            </div>
+
+
+            <p class="result-description">
+
+                ${description}
+
+            </p>
+
+
+            ${reasonHTML}
+
+
+            <div class="safety-box">
+
+                🛡️ <strong>Stay Safe:</strong><br>
+
+                Do not click suspicious links or share
+                your OTP, password, PIN or banking information.
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* ==========================================
+   CHECK KEYWORDS
+========================================== */
+
+function containsAny(text, words) {
+
+    return words.some(
+
+        word => text.includes(word)
+
+    );
+
+}
+
+
+/* ==========================================
+   CLEAR SCANNER
+========================================== */
+
+function clearScamMessage() {
+
+    document.getElementById(
+        "scamMessage"
+    ).value = "";
+
+
+    document.getElementById(
+        "scanResult"
+    ).innerHTML = "";
+
+}
+
+
+/* ==========================================
+   SAMPLE SCAM
+========================================== */
+
+function loadSampleScam() {
+
+    document.getElementById(
+        "scamMessage"
+    ).value =
+
+        "URGENT! Congratulations! You have won RM5,000. Click here to claim your prize immediately. Send your OTP to verify your account.";
+
+}
+
+</script>
+
+</body>
+</html>
